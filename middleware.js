@@ -1,33 +1,25 @@
-// import { NextResponse } from "next/server";
-// import { NextRequest } from "next/server";
-// import mongoose from "mongoose";
-// import User from "@/models/User";
-// import connectdb from "@/lib/connectdb";
+import { NextResponse } from "next/server";
 
-// export async function middleware(req) {
-//   await connectdb();
+export function middleware(request) {
+  const userId = request.cookies.get("userId")?.value;
 
-//   const userId = req.cookies.get("userId")?.value;
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-//   if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-//   }
+  // Forward request with user ID in headers
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-user-id", userId); // You can read this in your API route
 
-//   try {
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return NextResponse.json({ error: "User not found" }, { status: 401 });
-//     }
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
-//     // Add user to the request object (via request headers or URL cloning)
-//     const requestHeaders = new Headers(req.headers);
-//     requestHeaders.set("x-user-id", userId); // You can access this in your route later
+  return response;
+}
 
-//     const res = NextResponse.next();
-//     res.headers = requestHeaders;
-//     return res;
-
-//   } catch (err) {
-//     return NextResponse.json({ error: "Server error" }, { status: 500 });
-//   }
-// }
+export const config = {
+  matcher: ["/api/userdetails/:path*"], // Apply only to protected routes
+};

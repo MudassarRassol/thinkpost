@@ -2,13 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      index: true, // explicit index for faster queries
-    },
+
     email: {
       type: String,
       required: true,
@@ -19,6 +13,10 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    username: {
+      type: String,
+      default: "",
     },
     profilePic: {
       type: String,

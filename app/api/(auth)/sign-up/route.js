@@ -1,10 +1,10 @@
-import User from "@/models/User";
+import User from "@/models/User.js";
 import { NextResponse } from "next/server";
-import connectdb from "@/lib/connectdb";
-import bcrypt from "bcryptjs";
+import connectdb from "@/lib/connectdb.js";
+import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 
-export async function POST(req) {
+export async function POST(req,res) {
   await connectdb(); // connect to MongoDB
 
   try {
@@ -35,13 +35,7 @@ export async function POST(req) {
     const newUser = await User.create({ email, password: hashedPassword });
 
     // Set cookie (for example, saving userId)
-    cookies().set("userId", newUser._id.toString(), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-
+    cookies.set("userId", newUser._id.toString())
     return NextResponse.json(
       { message: "User created successfully", user: newUser },
       { status: 201 }
